@@ -28,7 +28,7 @@ myApp.factory("CustomerUser", function($resource){
 });
 
 // setup controller and pass data source
-myApp.controller("FormCtrl", function($http, $scope, Towns, Structures, Hows, Areas, CustomerCompany, CustomerUser){
+myApp.controller("FormCtrl", function($http, $scope, Towns, Structures, Hows, Areas, CustomerCompany, CustomerUser, $uibModal, $document){
 
   $scope.customer_company = new CustomerCompany();
   $scope.customer_user = new CustomerUser();
@@ -39,18 +39,20 @@ myApp.controller("FormCtrl", function($http, $scope, Towns, Structures, Hows, Ar
   $scope.structures = Structures;
   $scope.hows = Hows;
   $scope.areas = Areas;
-  $scope.enviat = false;
 
   $http.get('data/municipis.json').then(function(res){
     $scope.town_tree = res.data;
   });
 
   $scope.restart = function() {
+    $scope.ErrorModalInstance.close();
 	  $scope.data = {};
     $scope.enviat = false;
+    $scope.error = null;
   }
 
   $scope.send = function() {
+
     var date =  moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
 
     //Customer company
@@ -101,8 +103,9 @@ myApp.controller("FormCtrl", function($http, $scope, Towns, Structures, Hows, Ar
         $scope.customer_user.$save(function(data){
           console.log('customer user created');
         }, function(error){
-          $scope.error = true;
           console.log('error on customer user creation');
+          $scope.error = 'error on customer user creation';
+          $scope.showmodal();
         });
       });
     }, function(error){ console.log('customer company not found');
@@ -114,12 +117,29 @@ myApp.controller("FormCtrl", function($http, $scope, Towns, Structures, Hows, Ar
             console.log('customer user created');
           }, function(error){
             console.log('error on customer user creation');
-            $scope.error = true;
+            $scope.error = 'error on customer user creation';
+            $scope.showmodal();
           });
         });
-      }, function(error){ console.log('error on customer company creation'); $scope.error = error;
+      }, function(error){
+        console.log('error on customer company creation');
+        $scope.error = 'error on customer company creation';
+        $scope.showmodal();
       });
     });
     $scope.enviat = true;
+    $scope.showmodal();
+  }
+
+  $scope.showmodal =  function() {
+    var parentElem = angular.element($document[0].querySelector('#modal'));
+    $scope.ErrorModalInstance = $uibModal.open({
+      ariaLabelledBy: 'modal-title',
+      ariaDescribedBy: 'modal-body',
+      templateUrl: 'myModalContent.html',
+      controller: 'FormCtrl',
+      scope: $scope,
+      appendTo: parentElem,
+    });
   }
 });

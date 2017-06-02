@@ -68,17 +68,29 @@
         <div class="col-md-10 col-sm-12">
           <div ng-controller="FormCtrl">
 
-            <!-- MISSATGES -->
-            <div class="alert alert-warning" role="alert" ng-show="error">
-              <p>S'ha produit un error. Si us plau posa't en contacte amb serveis@voluntariat.org</p>
-              <p>{{error.message}}</p>
-              <button type="button" class="btn btn-warning" ng-click="restart()">Tornar a l'inici</button>
+            <!-- MODAL -->
+            <div id="modal">
+              <script type="text/ng-template" id="myModalContent.html">
+                  <div class="modal-header">
+                      <h3 class="modal-title" id="modal-title" ng-show="error">Error</h3>
+                      <h3 class="modal-title" id="modal-title" ng-show="enviat">Formulari enviat</h3>
+                  </div>
+                  <div class="modal-body" id="modal-body">
+                    <div class="alert alert-warning" role="alert" ng-show="error">
+                      <p>S'ha produit un error. Si us plau posa't en contacte amb serveis@voluntariat.org</p>
+                      <p>"{{error}}"</p>
+                    </div>
+                    <div class="alert alert-success" role="alert" ng-show="enviat">
+                      <p>El formulari s'ha registrat correctament.</p>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-warning" ng-click="restart()" ng-show="error">Reinicia</button>
+                      <button type="button" class="btn btn-success" ng-click="restart()" ng-show="enviat">Tornar a l'inici</button>
+                  </div>
+              </script>
             </div>
-            <div class="alert alert-success" role="alert" ng-show="enviat">
-              <p>El formulari s'ha registrat correctament.</p>
-              <button type="button" class="btn btn-success" ng-click="restart()">Tornar a l'inici</button>
-            </div>
-
+            
             <!-- DADES PERSONALS -->
             <div id="dades_personals">
               <h1 class="page-header">Registre d'una nova entitat/particular</h1>
@@ -222,6 +234,7 @@
                 <p>&nbsp;</p>
                 <button type="submit" class="btn btn-success">Finalitza</button>
               </form>
+              <button type="submit" class="btn btn-success" ng-click="showmodal()">Error</button>
             </div>
           </div>
         </div>
