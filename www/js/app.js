@@ -100,6 +100,9 @@ myApp.controller("FormCtrl", function($http, $scope, Towns, Structures, Hows, Ar
       },function(error){ console.log('customer user not found');
         $scope.customer_user.$save(function(data){
           console.log('customer user created');
+        }, function(error){
+          $scope.error = true;
+          console.log('error on customer user creation');
         });
       });
     }, function(error){ console.log('customer company not found');
@@ -109,6 +112,9 @@ myApp.controller("FormCtrl", function($http, $scope, Towns, Structures, Hows, Ar
         },function(error){ console.log('customer user not found');
           $scope.customer_user.$save(function(data){
             console.log('customer user created');
+          }, function(error){
+            console.log('error on customer user creation');
+            $scope.error = true;
           });
         });
       }, function(error){ console.log('error on customer company creation'); $scope.error = error;
