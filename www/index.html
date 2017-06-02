@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+  <head>
+    <!--
+    Customize this policy to fit your own app's needs. For more guidance, see:
+        https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+    Some notes:
+        * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+        * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+        * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+            * Enable inline JS: add 'unsafe-inline' to default-src
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src *; script-src *;">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <meta charset="UTF-8">
+
+    <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+    <script type="text/javascript" src="bower_components/angular-animate/angular-animate.min.js"></script>
+    <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
+    <script type="text/javascript" src="bower_components/moment/moment.js"></script>
+
+    <script type="text/javascript" src="js/app.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+
+    <title>Formularis d'assessorament i acompanyament</title>
+  </head>
+  <body ng-app="assessorament">
+    <nav class="navbar-1" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="http://web.gencat.cat/" target="_blank"><img src="img/logo-generalitat.gif" alt="Logo voluntariat.org"/></a>
+            </div>
+        </div>
+    </nav>
+    <nav class="navbar-2" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="http://www.voluntariat.org/" target="_blank"><img src="img/logo.png" alt="Logo voluntariat.org"/></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-1 col-sm-12">&nbsp;</div>
+        <div class="col-md-10 col-sm-12">
+          <div ng-controller="FormCtrl">
+
+            <!-- MISSATGES -->
+            <div class="alert alert-warning" role="alert" ng-show="error">
+              <p>S'ha produit un error. Si us plau posa't en contacte amb serveis@voluntariat.org</p>
+              <p>{{error.message}}</p>
+              <button type="button" class="btn btn-warning" ng-click="restart()">Tornar a l'inici</button>
+            </div>
+            <div class="alert alert-success" role="alert" ng-show="enviat">
+              <p>El formulari s'ha registrat correctament.</p>
+              <button type="button" class="btn btn-success" ng-click="restart()">Tornar a l'inici</button>
+            </div>
+
+            <!-- DADES PERSONALS -->
+            <div id="dades_personals">
+              <h1 class="page-header">Registre d'una nova entitat/particular</h1>
+              <form ng-submit="send()">
+                <fieldset class="form-group">
+                  <legend>Dades personals</legend>
+                  <div class="row">
+                    <div class="col-xs-6">
+                      <label for="nom">Nom</label>
+                        <input type="text" class="form-control" id="nom" ng-model="data.dades_personals.nom" required>
+                    </div>
+                    <div class="col-xs-6">
+                      <label for="cognom">Cognom</label>
+                        <input type="text" class="form-control" id="cognom" ng-model="data.dades_personals.cognom" required>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="form-group">
+                  <legend>Com es realitza la consulta</legend>
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input type="radio" class="form-check-input" ng-model="data.altres_dades.personal_entitat" value="personal" ng-required="!data.altres_dades.personal_entitat">
+                      A títol personal
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input type="radio" class="form-check-input" ng-model="data.altres_dades.personal_entitat" value="entitat" ng-required="!data.altres_dades.personal_entitat">
+                      En nom d'una entitat
+                    </label>
+                  </div>
+                </fieldset>
+                <fieldset class="form-group" ng-show="data.altres_dades.personal_entitat=='personal'">
+                  <legend>Altres dades personals</legend>
+                  <div class="row">
+                    <div class="form-group col-xs-6">
+                      <label for="dni">DNI</label>
+                      <input type="text" class="form-control" id="dni" ng-model="data.altres_dades.dni_nif" ng-required="data.altres_dades.personal_entitat=='personal'">
+                      <small class="form-text text-muted">Format: 00000000X</small>
+                    </div>
+                    <div class="form-group col-xs-6">
+                        <label for="email">Correu electrònic</label>
+                        <input type="email" class="form-control" id="email" ng-model="data.altres_dades.email" ng-required="data.altres_dades.personal_entitat=='personal'">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-xs-6">
+                        <label for="tel">Telèfon</label>
+                        <input type="tel" class="form-control" id="tel" ng-model="data.altres_dades.tel" ng-required="data.altres_dades.personal_entitat=='personal'">
+                    </div>
+                    <div class="form-group col-xs-6">
+                      <label for="town">Població</label>
+                      <input id="town" placeholder="Comença a escriure ..." type="text" ng-model="data.altres_dades.town" typeahead-editable="false" uib-typeahead="town for town in towns | filter:$viewValue | limitTo:8" class="form-control" typeahead-min-length="0" typeahead-no-results="noResults" ng-required="data.altres_dades.personal_entitat=='personal'">
+                      <span ng-if="noResults" uib-dropdown uib-dropdown-toggle auto-close="disabled" is-open="true">
+                        <ul class="uib-dropdown-menu" >
+                          <li><a href>No hi ha resultats</a></li>
+                        </ul>
+                      </span>
+                    </div>
+                  </div>
+                </fieldset>
+                <fieldset class="form-group" ng-show="data.altres_dades.personal_entitat=='entitat'">
+                  <legend>Dades de l'entitat</legend>
+                  <div class="row">
+                    <div class="form-group col-xs-6">
+                      <label for="nom_entitat">Nom de l'entitat</label>
+                      <input type="text" class="form-control" id="nom_entitat" ng-model="data.altres_dades.nom_entitat" ng-required="data.altres_dades.personal_entitat=='entitat'">
+                    </div>
+                    <div class="form-group col-xs-6">
+                      <label for="dni">NIF de l'entitat</label>
+                      <input type="text" class="form-control" id="dni" ng-model="data.altres_dades.dni_nif" ng-required="data.altres_dades.personal_entitat=='entitat'">
+                      <small class="form-text text-muted">Format: G00000000</small>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-xs-6">
+                        <label for="email">Correu electrònic</label>
+                        <input type="email" class="form-control" id="email" ng-model="data.altres_dades.email" ng-required="data.altres_dades.personal_entitat=='entitat'">
+                    </div>
+                    <div class="form-group col-xs-6">
+                        <label for="tel">Telèfon</label>
+                        <input type="tel" class="form-control" id="tel" ng-model="data.altres_dades.tel" ng-required="data.altres_dades.personal_entitat=='entitat'">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-xs-6">
+                      <label for="structure">Forma jurídica de l'entitat</label>
+                      <select id="structure" ng-model="data.altres_dades.structure" class="form-control" ng-required="data.altres_dades.personal_entitat=='entitat'">
+                        <option value="">- Selecciona una opció -</option>
+                        <option ng-repeat="structure in structures" ng-value="structure">{{structure}}</option>
+                      </select>
+                    </div>
+                    <div class="form-group col-xs-6">
+                      <label for="area">Àmbit d'actuació de l'entitat</label>
+                      <select id="area" ng-model="data.altres_dades.area" class="form-control" ng-required="data.altres_dades.personal_entitat=='entitat'">
+                        <option value="">- Selecciona una opció -</option>
+                        <option ng-repeat="area in areas" ng-value="area">{{area}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-xs-6">
+                      <label for="town">Població de l'entitat</label>
+                      <input id="town" placeholder="Comença a escriure ..." type="text" ng-model="data.altres_dades.town" typeahead-editable="false" uib-typeahead="town for town in towns | filter:$viewValue | limitTo:8" class="form-control" typeahead-min-length="0" typeahead-no-results="noResults" ng-required="data.altres_dades.personal_entitat=='entitat'">
+                      <span ng-if="noResults" uib-dropdown uib-dropdown-toggle auto-close="disabled" is-open="true">
+                        <ul class="dropdown-menu" >
+                          <li><a href>No hi ha resultats</a></li>
+                        </ul>
+                      </span>
+                    </div>
+                    <div class="form-group col-xs-6">
+                      <p>&nbsp;</p>
+                    </div>
+                  </div>
+                </fieldset>
+                <legend>Com ens han conegut?</legend>
+                <label for="how">Ens vols ajudar a millorar? Explica'ns com ens has conegut</label>
+                <select id="how" ng-model="data.conegut" class="form-control" required>
+                  <option value="">- Selecciona una opció -</option>
+                  <option ng-repeat="how in hows" ng-value="how">{{how}}</option>
+                </select>
+                <p>&nbsp;</p>
+                <div ng-show="data.tipus=='acompanyament'">
+                  <legend>Compromís</legend>
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" ng-model="data.compromis" value="" ng-required="data.tipus=='acompanyament'">
+                      Estic disposat a acceptar el <a href="http://www.voluntariat.org/Suport-i-serveis/Serveis-dassessorament-a-les-entitats/servei-acompanyament-integral" target="_blank">compromís d'acompanyament</a>
+                    </label>
+                  </div>
+                  <p>&nbsp;</p>
+                </div>
+                <legend>Avís legal</legend>
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" ng-model="data.lopd" value="" required>
+                    D'acord amb la Llei orgànica 15/1999, de protecció de dades de caràcter personal, les vostres dades seran incorporades al fitxer "Entitats de voluntariat", del qual és responsable la Direcció General d'Acció Cívica i Comunitària. La finalitat és integrar les dades a un banc de dades de les entitats sense afany de lucre de voluntariat de Catalunya i gestionar l'enviament de comunicacions als/a les voluntaris/àries. Podeu exercir els drets d'accés, rectificació, cancel.lació i oposició mitjançant un escrit adreçat al Servei de Promoció de l'Associacionisme i el Voluntariat: Passeig Taulat 266-270, 08019 Barcelona.
+                  </label>
+                </div>
+                <p>&nbsp;</p>
+                <button type="submit" class="btn btn-success">Finalitza</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-1 col-sm-12">&nbsp;</div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="container text-center">
+        <a href="http://web.gencat.cat/ca/menu-ajuda/ajuda/avis_legal/" target="_blank">Avís legal</a> |
+        <a href="http://web.gencat.cat/ca/menu-ajuda/ajuda/accessibilitat/" target="_blank">Accessibilitat</a> |
+        <a href="http://www.voluntariat.org/Sobre-el-web" target="_blank">Sobre el web</a> |
+        <a href="http://web.gencat.cat/ca/menu-ajuda/ajuda/sobre_gencat/" target="_blank">Sobre Gencat</a> |
+        © Generalitat de Catalunya
+      </div>
+    </div>
+  </body>
+</html>
