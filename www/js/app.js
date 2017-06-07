@@ -132,6 +132,7 @@ myApp.controller("FormCtrl", function($http, $scope, Towns, Structures, Hows, Ar
   }
 
   $scope.showmodal =  function() {
+    if ($scope.enviat) $scope.data = {};
     var parentElem = angular.element($document[0].querySelector('#modal'));
     $scope.ErrorModalInstance = $uibModal.open({
       ariaLabelledBy: 'modal-title',
